@@ -1,7 +1,9 @@
 <?php
 // файл /bitrix/php_interface/init.php
 // регистрируем обработчик
-AddEventHandler("main", "OnEpilog", Array("NotFoundEvent", "pageNotFound"));
+namespace Local\Handlers;
+
+use CEventLog;
 
 class NotFoundEvent
 {

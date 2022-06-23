@@ -1,7 +1,8 @@
 <?php
-// файл /bitrix/php_interface/init.php
-// регистрируем обработчик
-AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", Array("ActiveEvent", "onBeforeIBlockElementUpdate"));
+
+namespace Local\Handlers;
+
+use CIBlockElement;
 
 define("ID_BLOCK_PRODUCT",2);
 
