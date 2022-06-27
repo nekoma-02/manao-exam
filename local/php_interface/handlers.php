@@ -4,3 +4,4 @@ $eventManager->addEventHandler("iblock", "OnBeforeIBlockElementUpdate", array("L
 $eventManager->addEventHandler("main", "OnEpilog", array("Local\Handlers\NotFoundEvent", "pageNotFound"));
 $eventManager->addEventHandler("main", "OnBeforeEventAdd", array("Local\Handlers\FeedbackEvent", "onBeforeEventAddHandler"));
 $eventManager->addEventHandler("main", "OnBuildGlobalMenu", array("Local\Handlers\BuildMenuEvent", "onBuildGlobalMenu"));
+$eventManager->addEventHandler("main", "OnBeforeProlog", array("Local\Handlers\MetaTagEvent","onBeforePrologHandler"));
