@@ -1,0 +1,190 @@
+<?php
+
+use Bitrix\Main\Loader,
+    Bitrix\Iblock;
+
+if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
+
+class KatalogComp extends CBitrixComponent
+{
+
+    public function onPrepareComponentParams($arParams)
+    {
+        if (!isset($arParams["CACHE_TIME"])) {
+            $arParams["CACHE_TIME"] = 36000000;
+        }
+
+        if (!isset($arParams["PRODUCTS_IBLOCK_ID"])) {
+            $arParams["PRODUCTS_IBLOCK_ID"] = 0;
+        }
+
+        if (!isset($arParams["NEWS_IBLOCK_ID"])) {
+            $arParams["NEWS_IBLOCK_ID"] = 0;
+        }
+
+        return $arParams;
+    }
+
+
+    public function executeComponent()
+    {
+        $this->checkModule();
+        $this->getResult();
+        global $APPLICATION;
+        $APPLICATION->SetTitle(GetMessage("COUNT") . $this->arResult["PRODUCT_CNT"]);
+        $this->includeComponentTemplate();
+    }
+
+    public function checkModule()
+    {
+        if (!Loader::includeModule("iblock")) {
+            ShowError(GetMessage("SIMPLECOMP_EXAM2_IBLOCK_MODULE_NONE"));
+            return;
+        }
+    }
+
+
+    private function getNews()
+    {
+        $arNews = array();
+        $arNewsId = array();
+
+        $obNews = CIBlockElement::GetList(
+            array(),
+            array(
+                "IBLOCK_ID" => $this->arParams["NEWS_IBLOCK_ID"],
+                "ACTIVE" => "Y",
+            ),
+            false,
+            false,
+            array(
+                "NAME",
+                "ACTIVE_FROM",
+                "ID",
+            ),
+        );
+
+        while ($element = $obNews->Fetch()) {
+            $arNewsId[] = $element["ID"];
+            $arNews[$element["ID"]] = $element;
+        }
+        $result["AR_NEWS"] = $arNews;
+        $result["AR_NEWS_ID"] = $arNewsId;
+
+        return $result;
+        //echo 'novozti <br>';
+        // echo '<pre>'; print_r($arNews); echo '</pre>';
+    }
+
+    private function getSections(array $newsId)
+    {
+        $arSection = array();
+        $arSectionId = array();
+
+        $obSection = CIBlockSection::GetList(
+            array(),
+            array(
+                "IBLOCK_ID" => $this->arParams["PRODUCTS_IBLOCK_ID"],
+                "ACTIVE" => "Y",
+                $this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"] => $newsId,
+            ),
+            false,
+            array(
+                "NAME",
+                "IBLOCK_ID",
+                "ID",
+                $this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"],
+            ),
+            false
+        );
+
+        while ($catalog = $obSection->Fetch()) {
+            $arSectionId[] = $catalog["ID"];
+            $arSection[$catalog["ID"]] = $catalog;
+        }
+
+        $result["AR_SECTION"] = $arSection;
+        $result["AR_SECTION_ID"] = $arSectionId;
+
+        return $result;
+    }
+
+    private function getProducts(array $sectionId, array $arSection, array &$arNews) {
+        $obProduct = CIBlockElement::GetList(
+            array(),
+            array(
+                "IBLOCK_ID" => $this->arParams["PRODUCTS_IBLOCK_ID"],
+                "ACTIVE" => "Y",
+                "SECTION_ID" => $sectionId
+            ),
+            false,
+            false,
+            array(
+                "NAME",
+                "IBLOCK_SECTION_ID",
+                "ID",
+                "IBLOCK_ID",
+                "PROPERTY_ARTNUMBER",
+                "PROPERTY_MATERIAL",
+                "PROPERTY_PRICE",
+
+            ),
+        );
+
+        //$arNewsList = array();
+        $this->arResult["PRODUCT_CNT"] = 0;
+
+        while ($arProduct = $obProduct->Fetch()) {
+            $this->arResult["PRODUCT_CNT"]++;
+            foreach ($arSection[$arProduct["IBLOCK_SECTION_ID"]][$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $newsId) {
+                $arNews[$newsId]["PRODUCTS"][] = $arProduct;
+            }
+        }
+
+        $this->setResultCacheKeys(array("PRODUCT_CNT"));
+    }
+
+
+    public function getResult()
+    {
+        if ($this->startResultCache()) {
+            //новости
+            $temp = $this->getNews();
+
+            $arNews = $temp["AR_NEWS"];
+            $arNewsId = $temp["AR_NEWS_ID"];
+
+            unset($temp);
+
+            //echo '<pre>'; print_r($arNews); echo '</pre>';
+
+            //раздел
+            $temp = $this->getSections($arNewsId);
+            $arSection = $temp["AR_SECTION"];
+            $arSectionId = $temp["AR_SECTION_ID"];
+
+            unset($temp);
+
+            //echo '<pre>'; print_r($arSection); echo '</pre>';
+
+            //продукт
+            $this->getProducts($arSectionId, $arSection, $arNews);
+
+            //раздел -> новость
+            foreach ($arSection as $value) {
+
+                foreach ($value[$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $item) {
+                    $arNews[$item]["SECTIONS"][] = $value["NAME"];
+                }
+            }
+
+            $this->arResult["NEWS"] = $arNews;
+            
+            //echo '<pre>';
+            //print_r($this->arResult["NEWS"]);
+            //echo '</pre>';
+        } else {
+            $this->abortResultCache();
+        }
+    }
+}
