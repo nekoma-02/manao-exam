@@ -6,7 +6,7 @@ use Bitrix\Main\Loader;
 $eventManager = EventManager::getInstance();
 
 Loader::registerNamespace("Local\Handlers",Loader::getLocal('php_interface/handlers'));
-Loader::registerNamespace("Local\Entity",Loader::getLocal('php_interface/classes'));
+//Loader::registerNamespace("Local\Entity",Loader::getLocal('php_interface/classes'));
 
 if (file_exists(Loader::getLocal('php_interface/handlers.php'))) {
     require_once (Loader::getLocal('php_interface/handlers.php'));
