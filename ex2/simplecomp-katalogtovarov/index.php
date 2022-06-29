@@ -1,5 +1,5 @@
 <?
-require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 $APPLICATION->SetTitle("Простой компонент каталог товаров");
 ?><?$APPLICATION->IncludeComponent(
 	"exam2:katalogsimplecomp", 
@@ -7,10 +7,12 @@ $APPLICATION->SetTitle("Простой компонент каталог тов�
 	array(
 		"COMPONENT_TEMPLATE" => ".default",
 		"PRODUCTS_IBLOCK_ID" => "2",
-		"NEWS_IBLOCK_ID" => "1",
-		"PRODUCTS_IBLOCK_ID_PROPERTY" => "UF_NEWS_LINK",
+		"CLASSIF_IBLOCK_ID" => "7",
+		"TEMPLATE" => "",
+		"PROPERTY_CODE" => "FIRMA",
 		"CACHE_TYPE" => "A",
-		"CACHE_TIME" => "36000000"
+		"CACHE_TIME" => "36000000",
+		"CACHE_GROUPS" => "Y"
 	),
 	false
-);?><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+);?><? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>

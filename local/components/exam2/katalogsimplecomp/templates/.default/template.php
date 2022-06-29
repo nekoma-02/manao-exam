@@ -1,40 +1,36 @@
 <? if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die(); ?>
 <p><b><?= GetMessage("SIMPLECOMP_EXAM2_CAT_TITLE") ?></b></p>
 <?php
-if (count($arResult["NEWS"]) > 0) {
+if (count($arResult["SECT_ELEMENT"]) > 0) {
 ?>
     <ul>
         <?php
-        foreach ($arResult["NEWS"] as $new) {
+        foreach ($arResult["SECT_ELEMENT"] as $product) {
         ?>
             <li>
                 <b>
-                    <?= $new["NAME"]; ?>
+                    <?= $product["NAME"]; ?>
                 </b>
-                    - <?= $new["ACTIVE_FROM"]; ?>
-                    (<?= implode(",", $new["SECTIONS"]); ?>)
-                
+                <?php if (count($product["ELEMENTS"]) > 0) { ?>
+                    <ul>
+                        <?php
+                        foreach ($product["ELEMENTS"] as $element) {
+                        ?>
+                            <li>
+
+                                <a href="<?= $element['DETAIL_PAGE_URL'] ?>"> <?= $element["NAME"]; ?></a> -
+                                <?= $element["PROPERTY"]["PRICE"]["VALUE"]; ?> -
+                                <?= $element["PROPERTY"]["MATERIAL"]["VALUE"]; ?> -
+                                <?= $element["PROPERTY"]["ARTNUMBER"]["VALUE"]; ?>
+
+                            </li>
+                        <?php } ?>
+                    </ul>
+                <?php } ?>
+
             </li>
 
-            <?php
-           if (count($new["PRODUCTS"]) > 0) {
 
-            ?>
-                <ul>
-                    <?php
-                    foreach ($new["PRODUCTS"] as $product) {
-                    ?>
-                        <li>
-
-                            <?= $product["NAME"]; ?> -
-                            <?= $product["PROPERTY_PRICE_VALUE"]; ?> -
-                            <?= $product["PROPERTY_MATERIAL_VALUE"]; ?> -
-                            <?= $product["PROPERTY_ARTNUMBER_VALUE"]; ?>
-
-                        </li>
-                    <?php } ?>
-                </ul>
-            <?php } ?>
         <?php } ?>
     </ul>
 <?php } ?>
