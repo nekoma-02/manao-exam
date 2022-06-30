@@ -7,6 +7,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 
 class KatalogComp extends CBitrixComponent
 {
+    private $isFilter = false;
 
     public function onPrepareComponentParams($arParams)
     {
@@ -112,16 +113,29 @@ class KatalogComp extends CBitrixComponent
     }
 
     private function getProducts(array $sectionId, array $arSection, array &$arNews) {
+
+        $arFilter = array(
+            "IBLOCK_ID" => $this->arParams["PRODUCTS_IBLOCK_ID"],
+            "ACTIVE" => "Y",
+            "SECTION_ID" => $sectionId
+        );
+
+        if ($this->isFilter) {
+            $arFilter[] = array(
+                "LOGIC" => "OR",
+                array("<=PROPERTY_PRICE" => 1700, "=PROPERTY_MATERIAL" => "Дерево, ткань"),
+                array("<PROPERTY_PRICE" => 1500, "=PROPERTY_MATERIAL" => "Металл, пластик"),
+
+            );
+            $this->abortResultCache();
+        }
+
         $obProduct = CIBlockElement::GetList(
             array(
                 "NAME" => "asc",
                 "SORT" => "asc"
             ),
-            array(
-                "IBLOCK_ID" => $this->arParams["PRODUCTS_IBLOCK_ID"],
-                "ACTIVE" => "Y",
-                "SECTION_ID" => $sectionId
-            ),
+            $arFilter,
             false,
             false,
             array(
@@ -169,9 +183,18 @@ class KatalogComp extends CBitrixComponent
 
     public function getResult()
     {
+        $this->abortResultCache();
+        $isFilter = $this->request->getQuery("F");
+        if (isset($isFilter)) {
+            $this->isFilter = true;
+        }
 
        // echo '<pre>'; print_r($this->arParams); echo '</pre>';
-        if ($this->startResultCache()) {
+        if ($this->startResultCache(false, array($this->isFilter))) {
+
+            
+
+
             //новости
             $temp = $this->getNews();
 
