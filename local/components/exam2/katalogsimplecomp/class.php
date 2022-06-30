@@ -171,9 +171,10 @@ class KatalogComp extends CBitrixComponent
                 );
             
 
-            $this->arResult["PRODUCT_CNT"]++;
+            
             foreach ($arSection[$arProduct["IBLOCK_SECTION_ID"]][$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $newsId) {
                 $arNews[$newsId]["PRODUCTS"][] = $arProduct;
+                $this->arResult["PRODUCT_CNT"]++;
             }
         }
 
