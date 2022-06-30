@@ -47,18 +47,27 @@ class NewsComp extends CBitrixComponent
         }
     }
 
-    public function getResult()
-    {
-        global $USER;
-        if ($USER->IsAuthorized()) {
 
-            $userId = $USER->GetID();
+
+    private function getUserGroup($userId) {
+        global $USER;
             $userGroup = Cuser::GetList(
                 ($by = "id"),
                 ($order = "asc"),
                 array("ID" => $userId),
                 array("SELECT" => array($this->arParams["PROPERTY_UF"]))
             )->Fetch()[$this->arParams["PROPERTY_UF"]];
+
+            return $userGroup;
+    }
+
+    public function getResult()
+    {
+        global $USER;
+        if ($USER->IsAuthorized()) {
+
+            $userId = $USER->GetID();
+            $userGroup = $this->getUserGroup($userId);
 
             if ($this->StartResultCache(false, array($userGroup, $userId))) {
 
@@ -78,8 +87,9 @@ class NewsComp extends CBitrixComponent
                     $userListId[] = $arUser["ID"];
                 }
 
-                $arNewsAuthor = array();
-                $arNewsList = array();
+                $authorNews = array();
+                $news = array();
+                
                 $rsElements = CIBlockElement::GetList(
                     array(),
                     array(
@@ -97,23 +107,23 @@ class NewsComp extends CBitrixComponent
                     )
                 );
       
-                while ($arElement = $rsElements->GetNext()) {
+                while ($el = $rsElements->GetNext()) {
 
-                    $arNewsAuthor[$arElement["ID"]][] = $arElement["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"];
+                    $authorNews[$el["ID"]][] = $el["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"];
 
-                    if (empty($arNewsList[$arElement["ID"]])) {
-                        $arNewsList[$arElement["ID"]] = $arElement;
+                    if (empty($news[$el["ID"]])) {
+                        $news[$el["ID"]] = $el;
                     }
 
-                    if ($arElement["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"] != $userId) {
-                        $arNewsList[$arElement["ID"]]["AUTHORS"][] = $arElement["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"];
+                    if ($el["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"] != $userId) {
+                        $news[$el["ID"]]["AUTHORS"][] = $el["PROPERTY_" . $this->arParams["PROPERTY"] . "_VALUE"];
                     }
                 }
 
                 $count = 0;
-                foreach ($arNewsList as $key => $value) {
+                foreach ($news as $key => $value) {
 
-                    if (in_array($userId, $arNewsAuthor[$value["ID"]]))
+                    if (in_array($userId, $authorNews[$value["ID"]]))
                         continue;
 
                     foreach ($value["AUTHORS"] as $el) {
@@ -126,20 +136,24 @@ class NewsComp extends CBitrixComponent
 
                 unset($userList[$userId]);
 
+
+                //echo '<pre>'; print_r($userList); echo '</pre>';
+
                 $result = array();
+
                 // удаляем пользователя из списка пользователей если у него нету записей
-                foreach ($userList as $element) {
-                    if (!key_exists("NEWS", $element)) {
-                        continue;
+                foreach ($userList as $key => $value) {
+                    if (!key_exists("NEWS", $value)) {
+                        unset($userList[$key]);
                     }
-                    $result[] = $element;
+                    //$result[] = $element;
                 }
 
                 //echo '<pre>'; print_r($result); echo '</pre>';
 
 
 
-                $this->arResult["AUTHORS"] = $result;
+                $this->arResult["AUTHORS"] = $userList;
                 $this->arResult["COUNT"] = $count;
 
 
