@@ -29,7 +29,8 @@ if (count($arResult["NEWS"]) > 0) {
                             <?= $product["NAME"]; ?> -
                             <?= $product["PROPERTY_PRICE_VALUE"]; ?> -
                             <?= $product["PROPERTY_MATERIAL_VALUE"]; ?> -
-                            <?= $product["PROPERTY_ARTNUMBER_VALUE"]; ?>
+                            <?= $product["PROPERTY_ARTNUMBER_VALUE"]; ?> - 
+                            <?= $product["DETAIL_PAGE"]; ?>
 
                         </li>
                     <?php } ?>

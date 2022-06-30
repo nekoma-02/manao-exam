@@ -10,7 +10,8 @@ $APPLICATION->SetTitle("Простой компонент каталог тов�
 		"NEWS_IBLOCK_ID" => "1",
 		"PRODUCTS_IBLOCK_ID_PROPERTY" => "UF_NEWS_LINK",
 		"CACHE_TYPE" => "A",
-		"CACHE_TIME" => "36000000"
+		"CACHE_TIME" => "36000000",
+		"DETAIL_URL" => "catalog_exam/#SECTION_ID#/#ELEMENT_CODE#"
 	),
 	false
 );?><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

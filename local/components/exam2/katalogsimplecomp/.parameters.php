@@ -17,6 +17,12 @@ $arComponentParameters = array(
 			"PARENT" => "BASE",
 			"TYPE" => "STRING",
 		),
+		"DETAIL_URL" => array(
+			"NAME" => GetMessage("SIMPLECOMP_EXAM2_DETAIL_URL"),
+			"PARENT" => "BASE",
+			"TYPE" => "STRING",
+			"DEFAULT" => "catalog_exam/#SECTION_ID#/#ELEMENT_CODE#",
+		),
 		"CACHE_TIME" => array(
 			"DEFAULT"=> 36000000,
 		),

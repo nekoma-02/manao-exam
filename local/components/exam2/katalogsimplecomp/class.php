@@ -50,7 +50,9 @@ class KatalogComp extends CBitrixComponent
         $arNewsId = array();
 
         $obNews = CIBlockElement::GetList(
-            array(),
+            array(
+                
+            ),
             array(
                 "IBLOCK_ID" => $this->arParams["NEWS_IBLOCK_ID"],
                 "ACTIVE" => "Y",
@@ -111,7 +113,10 @@ class KatalogComp extends CBitrixComponent
 
     private function getProducts(array $sectionId, array $arSection, array &$arNews) {
         $obProduct = CIBlockElement::GetList(
-            array(),
+            array(
+                "NAME" => "asc",
+                "SORT" => "asc"
+            ),
             array(
                 "IBLOCK_ID" => $this->arParams["PRODUCTS_IBLOCK_ID"],
                 "ACTIVE" => "Y",
@@ -123,6 +128,7 @@ class KatalogComp extends CBitrixComponent
                 "NAME",
                 "IBLOCK_SECTION_ID",
                 "ID",
+                "CODE",
                 "IBLOCK_ID",
                 "PROPERTY_ARTNUMBER",
                 "PROPERTY_MATERIAL",
@@ -135,6 +141,22 @@ class KatalogComp extends CBitrixComponent
         $this->arResult["PRODUCT_CNT"] = 0;
 
         while ($arProduct = $obProduct->Fetch()) {
+
+            
+
+            $arProduct["DETAIL_PAGE"] = str_replace(
+                array(
+                    "#SECTION_ID#",
+                    "#ELEMENT_CODE#"
+                ),
+                array(
+                    $arProduct["IBLOCK_SECTION_ID"],
+                    $arProduct["CODE"],
+                ),
+                $this->arParams["DETAIL_URL"]
+                );
+            
+
             $this->arResult["PRODUCT_CNT"]++;
             foreach ($arSection[$arProduct["IBLOCK_SECTION_ID"]][$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $newsId) {
                 $arNews[$newsId]["PRODUCTS"][] = $arProduct;
@@ -147,6 +169,8 @@ class KatalogComp extends CBitrixComponent
 
     public function getResult()
     {
+
+       // echo '<pre>'; print_r($this->arParams); echo '</pre>';
         if ($this->startResultCache()) {
             //новости
             $temp = $this->getNews();
@@ -177,6 +201,8 @@ class KatalogComp extends CBitrixComponent
                     $arNews[$item]["SECTIONS"][] = $value["NAME"];
                 }
             }
+
+            //echo '<pre>'; print_r($arNews); echo '</pre>';
 
             $this->arResult["NEWS"] = $arNews;
             
