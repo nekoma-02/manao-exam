@@ -4,12 +4,18 @@
 
 echo '<a href = ' . '"' . $APPLICATION->GetCurPage() . '?F=Y">' . $APPLICATION->GetCurPage() . '?F=Y' . '</a>';
 
+
+//echo '<pre>'; print_r($arResult["NEWS"]); echo '</pre>';
+//die();
+
 if (count($arResult["NEWS"]) > 0) {
 ?>
     <?php
     $this->AddEditAction("add_element", $arResult["ADD_URL"], CIBlock::GetArrayByID($arResult["IBLOCK_ID"], "ELEMENT_ADD"));
+
     ?>
-    <ul id="<?=$this->GetEditAreaId("add_element");?>">
+        <ul id="<?=$this->GetEditAreaId("add_element");?>">
+
         <?php
         foreach ($arResult["NEWS"] as $new) {
         ?>

@@ -11,7 +11,8 @@ $APPLICATION->SetTitle("Простой компонент каталог тов�
 		"PRODUCTS_IBLOCK_ID_PROPERTY" => "UF_NEWS_LINK",
 		"CACHE_TYPE" => "A",
 		"CACHE_TIME" => "36000000",
-		"DETAIL_URL" => "catalog_exam/#SECTION_ID#/#ELEMENT_CODE#"
+		"DETAIL_URL" => "catalog_exam/#SECTION_ID#/#ELEMENT_CODE#",
+		"ELEMENT_IN_PAGE" => "4"
 	),
 	false
 );?><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

@@ -35,10 +35,11 @@ class KatalogComp extends CBitrixComponent
         $this->getResult();
         global $APPLICATION;
         $APPLICATION->SetTitle(GetMessage("COUNT") . $this->arResult["PRODUCT_CNT"]);
-        $this->includeComponentTemplate();
+       
     }
 
-    private function addButtonToSubmenu($blockID) {
+    private function addButtonToSubmenu($blockID)
+    {
         global $USER;
         if ($USER->IsAuthorized()) {
             $panel = CIBlock::GetPanelButtons($blockID);
@@ -130,7 +131,7 @@ class KatalogComp extends CBitrixComponent
         return $result;
     }
 
-    private function getProducts(array $sectionId, array $arSection, array &$arNews)
+    private function getProducts(array $sectionId, array $arSection, array $arNews)
     {
 
         $arFilter = array(
@@ -189,6 +190,10 @@ class KatalogComp extends CBitrixComponent
             $this->arResult["ADD_URL"] = $arProduct["ADD_URL"] = $panel["configure"]["add_element"]["ACTION_URL"];
             $this->arResult["IBLOCK_ID"] = $this->arParams["PRODUCTS_IBLOCK_ID"];
 
+            //$this->arResult["COUNT_PRODUCTS"] = count($arProduct);
+
+
+
             $arProduct["DETAIL_PAGE"] = str_replace(
                 array(
                     "#SECTION_ID#",
@@ -210,20 +215,44 @@ class KatalogComp extends CBitrixComponent
         }
 
         $this->setResultCacheKeys(array("PRODUCT_CNT"));
+
+        return $arNews;
+    }
+
+
+    private function getMinAndMaxPrice($arNews)
+    {
+        $prices = [];
+
+        foreach ($arNews["NEWS"] as $news) {
+            foreach ($news["PRODUCTS"] as $product) {
+                //print_r($product);
+                if (!empty($product["PROPERTY_PRICE_VALUE"])) {
+                    $prices[] = $product["PROPERTY_PRICE_VALUE"];
+                }
+            }
+        }
+
+        //echo '<pre>'; print_r($prices); echo '</pre>';
+
+        $this->arResult["MIN_PRICE"] = min($prices);
+        $this->arResult["MAX_PRICE"] = max($prices);
+
+        $this->SetResultCacheKeys(array("MIN_PRICE", "MAX_PRICE"));
     }
 
 
     public function getResult()
     {
         //$this->abortResultCache();
-        $isFilter = $this->request->getQuery("F");
-        if (isset($isFilter)) {
+        $qFilter = $this->request->getQuery("F");
+        if (isset($qFilter)) {
             $this->isFilter = true;
         }
 
         // echo '<pre>'; print_r($this->arParams); echo '</pre>';
-        if ($this->startResultCache(false, array($this->isFilter))) {
-
+        if ($this->StartResultCache(false, array($this->isFilter))) {
+            //if ($this->StartResultCache()) {
             //новости
             $temp = $this->getNews();
 
@@ -244,7 +273,7 @@ class KatalogComp extends CBitrixComponent
             //echo '<pre>'; print_r($arSection); echo '</pre>';
 
             //продукт
-            $this->getProducts($arSectionId, $arSection, $arNews);
+            $arNews = $this->getProducts($arSectionId, $arSection, $arNews);
 
             //раздел -> новость
             foreach ($arSection as $value) {
@@ -257,10 +286,8 @@ class KatalogComp extends CBitrixComponent
             //echo '<pre>'; print_r($arNews); echo '</pre>';
 
             $this->arResult["NEWS"] = $arNews;
-
-            // echo '<pre>';
-            // print_r($this->arResult["NEWS"]);
-            // echo '</pre>';
+            $this->getMinAndMaxPrice($this->arResult);   
+            $this->includeComponentTemplate();
         } else {
             $this->abortResultCache();
         }
