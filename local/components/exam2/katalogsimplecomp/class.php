@@ -30,10 +30,30 @@ class KatalogComp extends CBitrixComponent
     public function executeComponent()
     {
         $this->checkModule();
+        $this->addButtonToSubmenu($this->arParams["PRODUCTS_IBLOCK_ID"]);
+
         $this->getResult();
         global $APPLICATION;
         $APPLICATION->SetTitle(GetMessage("COUNT") . $this->arResult["PRODUCT_CNT"]);
         $this->includeComponentTemplate();
+    }
+
+    private function addButtonToSubmenu($blockID) {
+        global $USER;
+        if ($USER->IsAuthorized()) {
+            $panel = CIBlock::GetPanelButtons($blockID);
+
+            $this->addIncludeAreaIcons(
+                array(
+                    array(
+                        "ID" => "IB_LINK",
+                        "TITLE" => "ИБ в админке",
+                        "URL" => $panel["submenu"]["element_List"]["ACTION_URL"],
+                        "IN_PARAMS_MENU" => true,
+                    )
+                )
+            );
+        }
     }
 
     public function checkModule()
