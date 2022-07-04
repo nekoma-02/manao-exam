@@ -215,7 +215,7 @@ class KatalogComp extends CBitrixComponent
 
     public function getResult()
     {
-        $this->abortResultCache();
+        //$this->abortResultCache();
         $isFilter = $this->request->getQuery("F");
         if (isset($isFilter)) {
             $this->isFilter = true;
