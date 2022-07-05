@@ -35,7 +35,6 @@ class KatalogComp extends CBitrixComponent
         $this->getResult();
         global $APPLICATION;
         $APPLICATION->SetTitle(GetMessage("COUNT") . $this->arResult["PRODUCT_CNT"]);
-       
     }
 
     private function addButtonToSubmenu($blockID)
@@ -99,8 +98,6 @@ class KatalogComp extends CBitrixComponent
         $result["AR_NEWS_ID"] = $arNewsId;
 
         return $result;
-        //echo 'novozti <br>';
-        // echo '<pre>'; print_r($arNews); echo '</pre>';
     }
 
     private function getSections(array $newsId)
@@ -176,7 +173,6 @@ class KatalogComp extends CBitrixComponent
             ),
         );
 
-        //$arNewsList = array();
         $this->arResult["PRODUCT_CNT"] = 0;
 
         while ($arProduct = $obProduct->GetNext()) {
@@ -187,17 +183,11 @@ class KatalogComp extends CBitrixComponent
                 array("SECTION_BUTTONS" => false, "SESSID" => false)
             );
 
-            //echo '<pre>'; print_r($panel); echo '</pre>';
-
             $arProduct["EDIT_URL"] = $panel["edit"]["edit_element"]["ACTION_URL"];
             $arProduct["DELETE_URL"] = $panel["edit"]["delete_element"]["ACTION_URL"];
 
             $this->arResult["ADD_URL"] = $arProduct["ADD_URL"] = $panel["configure"]["add_element"]["ACTION_URL"];
             $this->arResult["IBLOCK_ID"] = $this->arParams["PRODUCTS_IBLOCK_ID"];
-
-            //$this->arResult["COUNT_PRODUCTS"] = count($arProduct);
-
-
 
             $arProduct["DETAIL_PAGE"] = str_replace(
                 array(
@@ -211,12 +201,10 @@ class KatalogComp extends CBitrixComponent
                 $this->arParams["DETAIL_URL"]
             );
 
-
-
             foreach ($arSection[$arProduct["IBLOCK_SECTION_ID"]][$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $newsId) {
                 if ($arNews[$newsId]) {
-                $arNews[$newsId]["PRODUCTS"][] = $arProduct;
-                $this->arResult["PRODUCT_CNT"]++;
+                    $arNews[$newsId]["PRODUCTS"][] = $arProduct;
+                    $this->arResult["PRODUCT_CNT"]++;
                 }
             }
         }
@@ -240,8 +228,6 @@ class KatalogComp extends CBitrixComponent
             }
         }
 
-        //echo '<pre>'; print_r($prices); echo '</pre>';
-
         $this->arResult["MIN_PRICE"] = min($prices);
         $this->arResult["MAX_PRICE"] = max($prices);
 
@@ -251,18 +237,19 @@ class KatalogComp extends CBitrixComponent
 
     public function getResult()
     {
-        //$this->abortResultCache();
         $qFilter = $this->request->getQuery("F");
         if (isset($qFilter)) {
             $this->isFilter = true;
         }
 
+        global $CACHE_MANAGER;
+
+
         $arNavigation = CDBResult::GetNavParams($this->arNavParams);
 
-         //echo '<pre>'; print_r($arNavigation); echo '</pre>';
-        if ($this->StartResultCache(false, array($this->isFilter, $arNavigation))) {
-            //if ($this->StartResultCache()) {
-            //новости
+        if ($this->StartResultCache(false, array($this->isFilter, $arNavigation),"taggedcache")) {
+            $CACHE_MANAGER->RegisterTag("iblock_id_3");
+
             $temp = $this->getNews();
 
             $arNews = $temp["AR_NEWS"];
@@ -270,35 +257,26 @@ class KatalogComp extends CBitrixComponent
 
             unset($temp);
 
-            //echo '<pre>'; print_r($arNews); echo '</pre>';
-
-            //раздел
             $temp = $this->getSections($arNewsId);
             $arSection = $temp["AR_SECTION"];
             $arSectionId = $temp["AR_SECTION_ID"];
 
             unset($temp);
 
-            //echo '<pre>'; print_r($arSection); echo '</pre>';
-
-            //продукт
             $arNews = $this->getProducts($arSectionId, $arSection, $arNews);
 
-            //раздел -> новость
             foreach ($arSection as $value) {
 
                 foreach ($value[$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $item) {
                     if ($arNews[$item]) {
-                    $arNews[$item]["SECTIONS"][] = $value["NAME"];
+                        $arNews[$item]["SECTIONS"][] = $value["NAME"];
                     }
                 }
             }
 
-        
-
             $this->arResult["NEWS"] = $arNews;
-            $this->getMinAndMaxPrice($this->arResult);  
-            //echo '<pre>'; print_r($this->arResult); echo '</pre>';
+            $this->getMinAndMaxPrice($this->arResult);
+
             $this->includeComponentTemplate();
         } else {
             $this->abortResultCache();

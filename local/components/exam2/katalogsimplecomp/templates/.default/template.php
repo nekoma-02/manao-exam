@@ -3,11 +3,11 @@
 <?php
 
 echo '<a href = ' . '"' . $APPLICATION->GetCurPage() . '?F=Y">' . $APPLICATION->GetCurPage() . '?F=Y' . '</a>';
-
-
-//echo '<pre>'; print_r($arResult["NEWS"]); echo '</pre>';
-//die();
-
+?>
+<br>
+Метка времени - <? echo time();?>
+<br>
+<?
 if (count($arResult["NEWS"]) > 0) {
 ?>
     <?php
