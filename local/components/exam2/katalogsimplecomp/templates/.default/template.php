@@ -54,4 +54,12 @@ if (count($arResult["NEWS"]) > 0) {
             <?php } ?>
         <?php } ?>
     </ul>
+                    </br>
+                    --- 
+                    <p>
+                        <b>
+                            Навигация
+                        </b>
+                    </p>
+                    <?php echo $arResult["NAV_STRING"]; ?>
 <?php } ?>

@@ -78,13 +78,18 @@ class KatalogComp extends CBitrixComponent
                 "ACTIVE" => "Y",
             ),
             false,
-            false,
+            array(
+                "nPageSize" => $this->arParams["ELEMENT_IN_PAGE"],
+                "bShowAll" => true
+            ),
             array(
                 "NAME",
                 "ACTIVE_FROM",
                 "ID",
             ),
         );
+
+        $this->arResult["NAV_STRING"] = $obNews->GetPageNavString("Страницы");
 
         while ($element = $obNews->Fetch()) {
             $arNewsId[] = $element["ID"];
@@ -209,8 +214,10 @@ class KatalogComp extends CBitrixComponent
 
 
             foreach ($arSection[$arProduct["IBLOCK_SECTION_ID"]][$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $newsId) {
+                if ($arNews[$newsId]) {
                 $arNews[$newsId]["PRODUCTS"][] = $arProduct;
                 $this->arResult["PRODUCT_CNT"]++;
+                }
             }
         }
 
@@ -250,8 +257,10 @@ class KatalogComp extends CBitrixComponent
             $this->isFilter = true;
         }
 
-        // echo '<pre>'; print_r($this->arParams); echo '</pre>';
-        if ($this->StartResultCache(false, array($this->isFilter))) {
+        $arNavigation = CDBResult::GetNavParams($this->arNavParams);
+
+         //echo '<pre>'; print_r($arNavigation); echo '</pre>';
+        if ($this->StartResultCache(false, array($this->isFilter, $arNavigation))) {
             //if ($this->StartResultCache()) {
             //новости
             $temp = $this->getNews();
@@ -279,14 +288,17 @@ class KatalogComp extends CBitrixComponent
             foreach ($arSection as $value) {
 
                 foreach ($value[$this->arParams["PRODUCTS_IBLOCK_ID_PROPERTY"]] as $item) {
+                    if ($arNews[$item]) {
                     $arNews[$item]["SECTIONS"][] = $value["NAME"];
+                    }
                 }
             }
 
-            //echo '<pre>'; print_r($arNews); echo '</pre>';
+        
 
             $this->arResult["NEWS"] = $arNews;
-            $this->getMinAndMaxPrice($this->arResult);   
+            $this->getMinAndMaxPrice($this->arResult);  
+            //echo '<pre>'; print_r($this->arResult); echo '</pre>';
             $this->includeComponentTemplate();
         } else {
             $this->abortResultCache();
