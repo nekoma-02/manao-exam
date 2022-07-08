@@ -1,16 +1,34 @@
 <?php
 
-//echo '<pre>'; print_r($arResult); echo '</pre>';
+namespace COMPONENT\NEWS\CONTROLLER;
 
+use Bitrix\Main\Engine\Contract\Controllerable;
+use Bitrix\Main\Engine\Controller;
 use Bitrix\Main\Type\DateTime;
+use CBitrixComponent;
+use CIBlockElement;
+use CModule;
 
-if (isset($arResult["REF_CANONICAL"])) {
-    $APPLICATION->SetPageProperty("canonical", $arResult["REF_CANONICAL"]);
-}
+class Feedback extends Controller
+{
+    // Обязательный метод
+    public function configureActions()
+    {
 
-if ($arParams["REPORT_AJAX"] == "N") {
+        return [
+            'sendClaim' => [ // Ajax-метод
+                'prefilters' => [],
+            ],
+        ];
+    }
 
-    if (isset($_GET["ID"])) {
+
+
+    
+    // Ajax-методы должны быть с постфиксом Action
+    public function sendClaimAction($idNews)
+    {
+
         $jsonObject = array();
 
         if (CModule::IncludeModule("iblock")) {
@@ -28,25 +46,20 @@ if ($arParams["REPORT_AJAX"] == "N") {
 
             $arFields = array(
                 "IBLOCK_ID" => 8,
-                "NAME" => "Новость " . $_GET["ID"],
+                "NAME" => "Новость " . $idNews,
                 "ACTIVE_FROM" => DateTime::createFromTimestamp(time()),
                 "PROPERTY_VALUES" => array(
                     "USER" => $arUser,
-                    "NEWS" => $_GET["ID"],
+                    "NEWS" => $idNews
                 ),
             );
 
             $element = new CIBlockElement(false);
             if ($el = $element->Add($arFields)) {
                 $jsonObject["ID"] = $el;
-                echo '
-                    <script>
-                        var textElem = document.getElementById("ajax-report-text");
-                        textElem.innerText = "Ваше мнение учтено!";
-                        window.history.pushState(null,null,"'.$APPLICATION->GetCurPage().'");
-                    </script>
-                ';
+                return $jsonObject;
             }
         }
+       // return null;
     }
 }

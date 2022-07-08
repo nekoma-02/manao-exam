@@ -7,22 +7,13 @@ $arTemplateParameters = array(
 		"TYPE" => "CHECKBOX",
 		"DEFAULT" => "Y",
 	),
-	"ID_CANONICAL" => Array(
-		"NAME" => GetMessage("ID_CANONICAL"),
-		"TYPE" => "STRING",
+	"DISPLAY_NAME" => Array(
+		"NAME" => GetMessage("T_IBLOCK_DESC_NEWS_NAME"),
+		"TYPE" => "CHECKBOX",
 		"DEFAULT" => "Y",
 	),
 	"DISPLAY_PICTURE" => Array(
 		"NAME" => GetMessage("T_IBLOCK_DESC_NEWS_PICTURE"),
-		"TYPE" => "CHECKBOX",
-	),
-	"SPECIALDATE" => Array(
-		"NAME" => GetMessage("SPECIALDATE"),
-		"TYPE" => "CHECKBOX",
-		"DEFAULT" => "Y",
-	),
-	"REPORT_AJAX" => Array(
-		"NAME" => "Отправлять жалобу AJAX",
 		"TYPE" => "CHECKBOX",
 		"DEFAULT" => "Y",
 	),
@@ -38,7 +29,7 @@ $arTemplateParameters = array(
 		"VALUE" => "Y",
 		"DEFAULT" =>"N",
 		"REFRESH"=> "Y",
-	),
+	),	
 );
 
 if ($arCurrentValues["USE_SHARE"] == "Y")
